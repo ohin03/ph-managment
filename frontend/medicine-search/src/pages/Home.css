@@ -1,0 +1,116 @@
+.home-wrapper {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px 25px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.home-wrapper h3 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+/* SearchBar container */
+.home-wrapper .searchbar-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Search input */
+.home-wrapper input[type="text"] {
+  width: 100%;
+  max-width: 500px;
+  padding: 14px 18px;
+  font-size: 1.2rem;
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.home-wrapper input[type="text"]:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 8px rgba(30,58,138,0.3);
+}
+
+/* Suggestions list */
+.home-wrapper .suggestions {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  margin-top: -5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  position: absolute;
+  z-index: 1000;
+}
+
+.home-wrapper .suggestions li {
+  padding: 12px 18px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.home-wrapper .suggestions li:hover,
+.home-wrapper .suggestions li.active {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
+/* Selected item input highlight */
+.home-wrapper .selected-input {
+  border-color: #1e3a8a;
+  background-color: #e0e7ff;
+  color: #1e3a8a;
+}
+
+/* Scrollbar for suggestions */
+.home-wrapper .suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.home-wrapper .suggestions::-webkit-scrollbar-thumb {
+  background: rgba(30,58,138,0.5);
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .home-wrapper {
+    padding: 20px 15px;
+  }
+
+  .home-wrapper h3 {
+    font-size: 1.7rem;
+  }
+
+  .home-wrapper input[type="text"] {
+    font-size: 1rem;
+  }
+
+  .home-wrapper .suggestions li {
+    font-size: 1rem;
+  }
+}
+
+
+
+
+
+
+
+
+

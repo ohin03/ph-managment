@@ -1,0 +1,21 @@
+/* ===== PREMIUM SOFT WHITE SUBMENU ===== */
+.x-submenu li a {
+  display: flex;
+  align-items: center;
+  height: 45px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  color: rgba(226, 224, 224, 0.549);   /* soft white */
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.x-submenu li a:hover {
+  background-color: #2c2c3e;
+  color: #ffffff; /* full white on hover */
+  transform: translateX(4px);
+}
+
+.x-navigation li.active > a {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-left: 3px solid #4da3ff;
+}

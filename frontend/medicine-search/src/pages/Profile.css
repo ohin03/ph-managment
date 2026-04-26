@@ -1,0 +1,115 @@
+.profile-container {
+  padding: 50px 0;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+.profile-card {
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: white;
+}
+
+/* Banner Design */
+.profile-top-banner {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 40px 20px;
+  text-align: center;
+  position: relative;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-circle-pro {
+  width: 90px;
+  height: 90px;
+  background: white;
+  color: #1e3c72;
+  font-size: 40px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator {
+  width: 18px;
+  height: 18px;
+  background: #2ecc71;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+/* Details Grid */
+.profile-details-grid {
+  display: flex;
+  justify-content: space-around;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-icon {
+  font-size: 20px;
+  padding: 10px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.mail-color { color: #e74c3c; }
+.phone-color { color: #27ae60; }
+
+.detail-info label {
+  font-size: 11px;
+  color: #888;
+  display: block;
+  margin-bottom: 2px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.detail-info h6 {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Floating Input Style */
+.form-control:focus {
+  border-color: #2a5298;
+  box-shadow: none;
+}
+
+.current-pass-highlight {
+  border: 2px solid #ffc107 !important;
+}
+
+.btn-primary-pro {
+  background: #1e3c72;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.btn-primary-pro:hover {
+  background: #2a5298;
+  transform: translateY(-2px);
+}

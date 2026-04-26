@@ -1,0 +1,128 @@
+/* Container: Pure and Clean */
+.login-page-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff; /* Background is White */
+}
+
+/* University Style Soft Animation */
+.white-anim-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.shape-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  z-index: 1;
+  animation: floatingMove 25s infinite alternate ease-in-out;
+}
+
+/* Circles in different sizes and positions */
+.sc-1 { width: 400px; height: 400px; top: -100px; left: -100px; opacity: 0.6; }
+.sc-2 { width: 300px; height: 300px; bottom: -50px; right: -50px; opacity: 0.4; animation-delay: -5s; }
+.sc-3 { width: 200px; height: 200px; top: 20%; right: 10%; opacity: 0.3; animation-duration: 30s; }
+
+@keyframes floatingMove {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(40px, 60px) rotate(90deg); }
+  100% { transform: translate(-20px, 20px) rotate(180deg); }
+}
+
+/* Login Card: Sharp & Professional */
+.login-card {
+  position: relative;
+  z-index: 10;
+  background: #ffffff;
+  padding: 50px 45px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Minimal Shadow */
+  border: 1px solid #f1f3f5;
+}
+
+.brand-name {
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #212529;
+  font-size: 26px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.brand-name span { color: #3b82f6; } /* Subtle Blue Accent */
+
+.sub-text {
+  text-align: center;
+  color: #adb5bd;
+  font-size: 14px;
+  margin-bottom: 35px;
+}
+
+/* Form Styling */
+.input-field {
+  margin-bottom: 22px;
+}
+
+.input-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  font-size: 15px;
+  background: #fcfcfc;
+  transition: all 0.2s ease;
+}
+
+input:focus {
+  border-color: #3b82f6;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+}
+
+/* Button: Clean Blue */
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background-color: #212529; /* Dark Grayish Black for Premium look */
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #000;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 35px 25px;
+    margin: 20px;
+  }
+}

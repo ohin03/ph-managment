@@ -1,0 +1,40 @@
+
+
+
+/* Modal backdrop and structure */
+.modal-backdrop.show { background-color: rgba(0,0,0,0.4); z-index: 1040; position: fixed; top:0; left:0; width:100%; height:100%; }
+.modal.d-block { display:flex; align-items:center; justify-content:center; z-index:1050; overflow:auto; }
+.modal-dialog { max-width:500px; width:100%; margin:0; border-radius:8px; overflow:visible; box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+.modal-content { background:#fff; border-radius:8px; padding:0; position:relative; z-index:1060; overflow:visible; }
+.modal-header { background:#f8f9fa; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #dee2e6; z-index:1070; }
+.modal-header .modal-title { font-size:1.25rem; font-weight:600; color:#333; }
+
+/* Close button */
+.close.cc { background:none; border:none; font-size:2rem; width:40px; height:40px; line-height:1; text-align:center; border-radius:50%; cursor:pointer; color:red; display:flex; align-items:center; justify-content:center; padding:0; transition:0.2s; }
+.close.cc:hover { background:#e0e0e0; color:#000; }
+
+/* Modal body */
+.modal-body { padding:20px 24px; width:100%; position:relative; z-index:1080; }
+.form-group { margin-bottom:16px; width:100%; display:block; }
+.form-group label { font-weight:500; margin-bottom:6px; display:block; color:#444; }
+
+/* Inputs */
+.form-control { width:100%; padding:8px 12px; border:1px solid #ccc; border-radius:6px; outline:none; font-size:0.95rem; transition:border-color 0.2s,box-shadow 0.2s; box-sizing:border-box; background:#fff; position:relative; z-index:1; }
+.form-control:focus { border-color:#4a90e2; box-shadow:0 0 5px rgba(74,144,226,0.3); }
+
+/* Checkbox */
+.form-check { margin-bottom:8px; position:relative; z-index:1; }
+.form-check-input { margin-right:8px; }
+
+/* Footer buttons */
+.modal-footer { display:flex; justify-content:flex-end; gap:10px; padding:16px 24px; border-top:1px solid #dee2e6; background:#f8f9fa; z-index:1090; }
+.btn { padding:6px 16px; font-size:0.95rem; border-radius:6px; border:none; cursor:pointer; transition:0.2s; }
+.btn-primary { background:#4a90e2; color:#fff; }
+.btn-primary:hover { background:#357ab7; }
+.btn-secondary { background:#e0e0e0; color:#333; }
+.btn-secondary:hover { background:#c6c6c6; }
+
+/* React Select custom styles */
+.react-select__control { border-radius:6px; min-height:38px; border:1px solid #ccc; }
+.react-select__control--is-focused { border-color:#4a90e2; box-shadow:0 0 5px rgba(74,144,226,0.3); }
+.react-select__menu { z-index:9999; }

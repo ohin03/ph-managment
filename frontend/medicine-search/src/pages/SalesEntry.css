@@ -1,0 +1,10 @@
+/* print-hide: print এ hide হবে */
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+  /* শুধু Sales Entry দেখাতে চাই print এ */
+  .print-only-form {
+    display: block !important;
+  }
+}
