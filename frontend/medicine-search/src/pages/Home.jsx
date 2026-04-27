@@ -1,13 +1,9 @@
 import React from "react";
-import SearchBar from "../components/SearchBar";
-import "./Home.css";
+import Dashboard from "./Dashboard";
 
 const Home = () => {
   return (
-    <div className="home-wrapper">
-      <h3>Search Medicine</h3>
-      <SearchBar />
-    </div>
+    <Dashboard />
   );
 };
 

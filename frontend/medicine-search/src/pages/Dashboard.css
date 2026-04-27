@@ -1,0 +1,199 @@
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary: #4318FF;
+  --secondary: #6AD2FF;
+  --success: #05CD99;
+  --danger: #EE5D50;
+  --dark-navy: #0B1437;
+  --text-main: #1B2559;
+  --text-muted: #A3AED0;
+  --bg-main: #F4F7FE;
+  --transition-ultra: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+/* --- Smooth Page Entrance --- */
+.container-fluid {
+  animation: slideUpFade 0.8s ease-in-out forwards;
+}
+
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(40px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Premium Top Bar & Icons --- */
+.icon-badge-box, .profile-pill {
+  transition: var(--transition-ultra);
+  border: 1px solid #E0E5F2 !important;
+}
+
+.icon-badge-box:hover, .profile-pill:hover {
+  background: var(--primary) !important;
+  color: white !important;
+  transform: translateY(-3px) rotate(5deg);
+  box-shadow: 0 10px 20px rgba(67, 24, 255, 0.2);
+}
+
+.icon-badge-box:hover svg, .profile-pill:hover span, .profile-pill:hover svg {
+  color: white !important;
+}
+
+/* --- Floating KPI Cards --- */
+.kpi-card {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  transition: var(--transition-ultra);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  transform: translateY(-15px) scale(1.03);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* KPI Hover Effect - Shine Line */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+  opacity: 0;
+  transition: 0.6s;
+}
+
+.kpi-card:hover::before {
+  opacity: 1;
+  transform: scale(0.5);
+}
+
+/* --- Interactive Charts Section --- */
+.card {
+  border-radius: 24px !important;
+}
+
+.chart-filter {
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.chart-filter:hover {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+/* --- Global Reports Button (Pulse Animation) --- */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: -100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+  z-index: -1;
+}
+
+.btn-primary:hover::after {
+  left: 100%;
+}
+
+/* --- Table Styles: Glassmorphism --- */
+.table-responsive {
+  border-radius: 20px;
+}
+
+.table thead th {
+  background-color: #F7F9FC !important;
+  letter-spacing: 1.5px;
+  border-bottom: 2px solid #E0E5F2 !important;
+}
+
+.table tbody tr {
+  transition: 0.3s;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(67, 24, 255, 0.03) !important;
+  transform: translateX(10px);
+}
+
+/* --- Status Pills (Neon Glow) --- */
+.status-pill {
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.status-paid {
+  background-color: #E6FFF5 !important;
+  color: #00A389 !important;
+  border: 1px solid rgba(0, 163, 137, 0.2);
+}
+
+.status-pending {
+  background-color: #FFF9E6 !important;
+  color: #FFB547 !important;
+  border: 1px solid rgba(255, 181, 71, 0.2);
+}
+
+/* --- Progress Bar Animation --- */
+.progress-bar {
+  border-radius: 10px;
+  animation: progressFill 2s ease-out forwards;
+  background: linear-gradient(90deg, var(--primary), var(--secondary)) !important;
+}
+
+@keyframes progressFill {
+  from { width: 0; }
+}
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E0;
+  border-radius: 10px;
+  border: 3px solid var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* --- Quick Navigation Background Decoration --- */
+.deco-circle-1 {
+  background: linear-gradient(135deg, #4318FF 0%, #6AD2FF 100%);
+  filter: blur(60px);
+  animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
