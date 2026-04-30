@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { getToken } from "../utils/token.util";
+import api from "../services/api";
 import { toast } from "react-toastify";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -15,8 +14,7 @@ const AttendanceReport = () => {
 
     const fetchReport = async () => {
         try {
-            const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-            const res = await axios.get(`http://localhost:5000/api/hr/attendance-report?startDate=${dates.start}&endDate=${dates.end}`, config);
+            const res = await api.get(`/hr/attendance-report?startDate=${dates.start}&endDate=${dates.end}`);
             setReport(res.data);
         } catch (err) {
             toast.error("Failed to load analytics");

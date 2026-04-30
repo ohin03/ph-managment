@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-import { getToken } from "../utils/token.util";
+import api from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 
 const HRDashboard = () => {
@@ -15,12 +14,10 @@ const HRDashboard = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-
     // Memoized fetch function jate bar bar create na hoy
     const fetchStats = useCallback(async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/hr/hr-stats", config);
+            const res = await api.get("/hr/hr-stats");
             setStats(res.data);
             setLoading(false);
         } catch (err) {

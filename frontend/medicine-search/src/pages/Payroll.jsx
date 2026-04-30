@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { toast } from "react-toastify";
-import { getToken } from "../utils/token.util";
 
 const Payroll = () => {
     const [employees, setEmployees] = useState([]);
@@ -22,12 +21,10 @@ const Payroll = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
-    const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-
     const fetchData = useCallback(async () => {
         try {
-            const empRes = await axios.get("http://localhost:5000/api/hr/employees", config);
-            const histRes = await axios.get(`http://localhost:5000/api/hr/salary-history?month=${monthDisplay}`, config);
+            const empRes = await api.get("/hr/employees");
+            const histRes = await api.get(`/hr/salary-history?month=${monthDisplay}`);
             setEmployees(empRes.data);
             setHistory(histRes.data);
         } catch (err) { console.error(err); }
@@ -48,7 +45,7 @@ const Payroll = () => {
         setSelectedEmp(emp);
         if (emp) {
             setPaidInput(emp.salary); 
-            const res = await axios.get(`http://localhost:5000/api/hr/last-due/${id}`, config);
+            const res = await api.get(`/hr/last-due/${id}`);
             setLastDue(res.data.lastDue || 0);
         }
     };
@@ -56,7 +53,7 @@ const Payroll = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Delete this record permanently?")) {
             try {
-                await axios.delete(`http://localhost:5000/api/hr/salary-delete/${id}`, config);
+                await api.delete(`/hr/salary-delete/${id}`);
                 toast.success("Record Deleted");
                 fetchData();
             } catch (err) { toast.error("Error!"); }
@@ -82,10 +79,10 @@ const Payroll = () => {
 
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:5000/api/hr/salary-update/${editId}`, payload, config);
+                await api.put(`/hr/salary-update/${editId}`, payload);
                 toast.info("Record Updated");
             } else {
-                await axios.post("http://localhost:5000/api/hr/pay-salary", payload, config);
+                await api.post("/hr/pay-salary", payload);
                 toast.success("Salary Disbursed!");
             }
             setSelectedEmp(null); setIsEditing(false); setPaidInput(0); setAdvance(0); setDeduction(0); fetchData();

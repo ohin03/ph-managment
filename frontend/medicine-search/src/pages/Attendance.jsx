@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { toast } from "react-toastify";
-import { getToken } from "../utils/token.util";
 
 const Attendance = () => {
     const [employees, setEmployees] = useState([]);
     const [attendanceData, setAttendanceData] = useState({});
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const config = { headers: { Authorization: `Bearer ${getToken()}` } };
 
     // 1. Fetch Employees & Attendance (Logical Sync)
     const fetchAttendanceData = useCallback(async () => {
         try {
-            const empRes = await axios.get("http://localhost:5000/api/hr/employees", config);
+            const empRes = await api.get("/hr/employees");
             setEmployees(empRes.data);
 
-            const attRes = await axios.get(`http://localhost:5000/api/hr/attendance-check?date=${date}`, config);
+            const attRes = await api.get(`/hr/attendance-check?date=${date}`);
             
             let initial = {};
             if (attRes.data && attRes.data.length > 0) {
@@ -49,7 +47,7 @@ const Attendance = () => {
                     status: attendanceData[id]
                 }))
             };
-            await axios.post("http://localhost:5000/api/hr/attendance-save", payload, config);
+            await api.post("/hr/attendance-save", payload);
             toast.success(`🎯 Attendance for ${date} Synced!`);
         } catch (err) { 
             toast.error("Submission Failed!"); 
