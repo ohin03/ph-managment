@@ -13,8 +13,11 @@ const VendorReceiveReport = () => {
   const [paymentStats, setPaymentStats] = useState([]);
   const [dailyStats, setDailyStats] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [filters, setFilters] = useState({ startDate: "", endDate: "", paymentMethod: "" });
+
+  // --- Pagination State ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchReport = async () => {
     setLoading(true);
@@ -23,6 +26,7 @@ const VendorReceiveReport = () => {
       const report = res.data.data;
       setData(report);
       setTotal(res.data.totalAmount);
+      setCurrentPage(1); // Reset to first page on new filter
 
       const stats = [
         { name: "Cash", value: report.filter(i => i.paymentMethod === "CASH").reduce((a, b) => a + b.amount, 0) },
@@ -43,12 +47,18 @@ const VendorReceiveReport = () => {
 
   useEffect(() => { fetchReport(); }, []);
 
+  // --- Pagination Logic ---
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTableData = data.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <div className="container-fluid py-4" style={{ backgroundColor: "#F8FAFC", minHeight: "100vh" }}>
       
       {/* 📋 SIMPLE BREADCRUMB & TITLE */}
       <div className="mb-4">
-        <h4 className="fw-bold text-dark mb-1">Vendor Payment Report</h4>
+        <h4 className="fw-bold text-danger mb-1">Vendor Payment Report</h4>
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item small text-muted">Reports</li>
@@ -58,7 +68,7 @@ const VendorReceiveReport = () => {
       </div>
 
       {/* 🔍 COMPACT FILTER BAR */}
-      <div className="card border-0 shadow-sm rounded-3 mb-4">
+      <div className="card border-0 shadow-sm rounded-3 mb-4 bg-dark-subtle">
         <div className="card-body p-3">
           <div className="row g-2 align-items-center">
             <div className="col-md-3">
@@ -117,7 +127,7 @@ const VendorReceiveReport = () => {
           </div>
         </div>
         <div className="col-lg-4">
-          <div className="card border-0 shadow-sm rounded-3 p-4 bg-white text-center">
+          <div className="card border-0 shadow-sm rounded-3 p-4 bg-white text-center bg-info-subtle">
             <h6 className="fw-bold mb-4">Payment Method Mix</h6>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -135,7 +145,7 @@ const VendorReceiveReport = () => {
       {/* 📄 CLEAN TABLE */}
       <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
         <div className="card-header bg-white py-3 border-0">
-          <h6 className="fw-bold mb-0">Transaction Ledger</h6>
+          <h6 className="fw-bold mb-0 text-success">Transaction Ledger</h6>
         </div>
         <div className="table-responsive">
           <table className="table table-hover align-middle mb-0">
@@ -149,7 +159,7 @@ const VendorReceiveReport = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((item) => (
+              {currentTableData.map((item) => (
                 <tr key={item._id} className="border-bottom">
                   <td className="px-4 py-3 fw-bold text-primary">{item.receiptNo}</td>
                   <td className="px-4 py-3 fw-bold">{item.vendorId?.name}</td>
@@ -164,6 +174,29 @@ const VendorReceiveReport = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* --- PAGINATION CONTROLS --- */}
+        <div className="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+          <small className="fw-bold text-muted">
+            Page <span className="text-dark">{currentPage}</span> of <span className="text-dark">{totalPages || 1}</span>
+          </small>
+          <div className="btn-group">
+            <button 
+              className="btn btn-sm btn-outline-primary px-3" 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => prev - 1)}
+            >
+              Previous
+            </button>
+            <button 
+              className="btn btn-sm btn-outline-primary px-3" 
+              disabled={currentPage === totalPages || totalPages === 0}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 

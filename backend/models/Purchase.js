@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
 
 const ItemSchema = new mongoose.Schema({
+  medicineId: { type: mongoose.Schema.Types.ObjectId, ref: "Item", default: null },
   medicine: { type: String, required: true },
   batch: String,
+  unit: { type: String, trim: true, default: "pcs" },
+  conversionRate: { type: Number, default: 1 },
   quantity: { type: Number, required: true },
   price: { type: Number, required: true },
+  salePrice: { type: Number, default: 0 },
   expiryDate: Date,
   total: Number
 });

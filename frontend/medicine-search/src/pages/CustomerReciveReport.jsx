@@ -14,7 +14,6 @@ import {
   CartesianGrid
 } from "recharts";
 
-// 🌈 Professional Cash-Flow Palette
 const COLORS = ["#10B981", "#3B82F6", "#F59E0B", "#8B5CF6", "#6366F1", "#EC4899"];
 
 const CustomerReciveReport = () => {
@@ -23,11 +22,16 @@ const CustomerReciveReport = () => {
   const [to, setTo] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // --- Pagination State ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; 
+
   const loadReport = async () => {
     setLoading(true);
     try {
       const res = await api.get("/reports/customer-receive-report", { params: { from, to } });
       setData(res.data);
+      setCurrentPage(1); // Reset to page 1 on new search
     } catch (err) { console.error(err); }
     setLoading(false);
   };
@@ -36,14 +40,21 @@ const CustomerReciveReport = () => {
 
   const formatMonth = (m) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1] || m;
 
+  // --- Pagination Logic ---
+  const totalRecentRecords = data.recentReceives?.length || 0;
+  const totalPages = Math.ceil(totalRecentRecords / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRecords = data.recentReceives?.slice(indexOfFirstItem, indexOfLastItem) || [];
+
   return (
     <div className="container-fluid py-4" style={{ backgroundColor: "#F8FAFC", minHeight: "100vh", fontFamily: "'Inter', sans-serif" }}>
       
       {/* 🚀 SMART HEADER & FILTER */}
-      <div className="bg-white p-4 rounded-4 shadow-sm mb-4 border-0">
+      <div className="bg-white p-4 rounded-4 shadow-sm mb-4 border-0 bg-dark-subtle">
         <div className="row align-items-center">
           <div className="col-lg-5">
-            <h2 className="fw-900 text-dark mb-1" style={{ letterSpacing: '-1.5px' }}>💰 Collection Insights</h2>
+            <h2 className="fw-900 text-danger mb-1" style={{ letterSpacing: '-1.5px' }}>💰 Collection Insights</h2>
             <p className="text-muted small fw-bold text-uppercase mb-0">Customer Payments & Revenue Tracking</p>
           </div>
           <div className="col-lg-7 d-flex gap-2 justify-content-lg-end mt-3 mt-lg-0">
@@ -89,9 +100,9 @@ const CustomerReciveReport = () => {
       </div>
 
       <div className="row g-4 mb-4">
-        {/* 📈 MONTHLY COLLECTIONS (MODERN BAR) */}
+        {/* 📈 MONTHLY COLLECTIONS */}
         <div className="col-xl-7">
-          <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+          <div className="card border-0 shadow-sm rounded-4 p-4 bg-info-subtle h-100">
             <h6 className="fw-900 text-muted text-uppercase small mb-4">Collection Trend 📊</h6>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={data.monthlyReceive?.map(item => ({ month: formatMonth(item._id.month), total: item.total })) || []}>
@@ -105,10 +116,10 @@ const CustomerReciveReport = () => {
           </div>
         </div>
 
-        {/* 🍩 PAYMENT METHODS (MODERN PIE) */}
+        {/* 🍩 PAYMENT METHODS */}
         <div className="col-xl-5">
           <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
-            <h6 className="fw-900 text-muted text-uppercase small mb-4 text-center">Payment Channels ⚡</h6>
+            <h6 className="fw-900 text-muted text-uppercase small mb-4 text-center text-danger">Payment Channels ⚡</h6>
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
@@ -132,10 +143,10 @@ const CustomerReciveReport = () => {
       </div>
 
       <div className="row g-4">
-        {/* 🏆 TOP CUSTOMERS (LEADERBOARD STYLE) */}
+        {/* 🏆 TOP CUSTOMERS */}
         <div className="col-lg-4">
-          <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
-            <h6 className="fw-900 text-muted text-uppercase small mb-4">Top Contributors 🏆</h6>
+          <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 bg-success-subtle">
+            <h6 className="fw-900 text-muted text-uppercase small mb-4 ">Top Contributors 🏆</h6>
             <div className="list-group list-group-flush">
               {data.topCustomers?.map((c, i) => (
                 <div key={i} className="list-group-item border-0 px-0 d-flex justify-content-between align-items-center mb-2">
@@ -150,10 +161,10 @@ const CustomerReciveReport = () => {
           </div>
         </div>
 
-        {/* 📑 RECENT TRANSACTIONS (CLEAN TABLE) */}
+        {/* 📑 RECENT TRANSACTIONS WITH PAGINATION */}
         <div className="col-lg-8">
           <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
-            <h6 className="fw-900 text-muted text-uppercase small mb-4">Recent Receipts 🧾</h6>
+            <h6 className="fw-900 text-uppercase small mb-4 text-success">Recent Receipts 🧾</h6>
             <div className="table-responsive">
               <table className="table table-hover align-middle">
                 <thead className="table-light">
@@ -165,7 +176,7 @@ const CustomerReciveReport = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.recentReceives?.map((r, i) => (
+                  {currentRecords.map((r, i) => (
                     <tr key={i} className="border-bottom">
                       <td className="fw-bold text-primary">#{r.receiptNo}</td>
                       <td className="fw-medium">{r.customerId?.name}</td>
@@ -175,6 +186,29 @@ const CustomerReciveReport = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* --- PAGINATION CONTROLS --- */}
+            <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+              <small className="fw-bold text-muted">
+                Page <span className="text-dark">{currentPage}</span> of <span className="text-dark">{totalPages || 1}</span>
+              </small>
+              <div className="btn-group">
+                <button 
+                  className="btn btn-sm btn-outline-secondary rounded-start-pill px-3" 
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                >
+                  Prev
+                </button>
+                <button 
+                  className="btn btn-sm btn-outline-secondary rounded-end-pill px-3" 
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -186,6 +220,7 @@ const CustomerReciveReport = () => {
         .transition-up:hover { transform: translateY(-8px); }
         .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
         .form-control:focus { outline: none; box-shadow: none; }
+        .btn-outline-secondary:disabled { border-color: #eee; color: #ccc; }
       `}</style>
     </div>
   );

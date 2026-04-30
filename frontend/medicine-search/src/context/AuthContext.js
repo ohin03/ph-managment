@@ -35,8 +35,8 @@ export const AuthProvider = ({ children }) => {
   const [authed, setAuthed] = useState(!!getToken());
   const [user, setUser] = useState(getInitialUser());
 
-  // `sessionStorage` already keeps the user logged-in on refresh and clears when the tab closes.
-  // Removing the unload/pagehide cleanup avoids logout while refreshing or navigating in-app.
+  // `sessionStorage` keeps the token for the current browser tab but clears automatically when the browser is closed.
+  // This makes login required again on every new browser session, matching university-style behavior.
 
   const login = (token, userData) => {
     setToken(token);

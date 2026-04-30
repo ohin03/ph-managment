@@ -43,6 +43,7 @@ const SalesEntry = () => {
   const [editSaleId, setEditSaleId] = useState(null);
 
   const [salesList, setSalesList] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -80,7 +81,8 @@ const SalesEntry = () => {
     if (!search.trim()) return setSearchResults([]);
     const delay = setTimeout(async () => {
       try {
-        const res = await api.get(`/search?q=${search}`);
+        // Use medicine master search so newly created medicines from PurchaseEntry appear immediately
+        const res = await api.get(`/medicines/search?q=${encodeURIComponent(search)}`);
         setSearchResults(res.data);
         setSelectedIndex(-1);
       } catch {
@@ -105,14 +107,19 @@ const SalesEntry = () => {
   const addToCart = (item) => {
     const exists = cart.find((i) => i._id === item._id);
     if (exists) return toast.info("Already added!");
+    const salePrice = item.salesPrice !== undefined && item.salesPrice !== null && item.salesPrice !== ""
+      ? Number(item.salesPrice)
+      : Number(item.purchasePrice || 0);
+
     setCart([
       ...cart,
       {
         ...item,
         name: item.name || item.item_name,
+        genericName: item.genericName || item.generic_name || "",
         quantity: 1,
-        price: item.salesPrice || 0, // ✅ use salesPrice
-        total: item.salesPrice || 0,
+        price: salePrice,
+        total: salePrice,
       },
     ]);
     setSearch("");
@@ -219,6 +226,9 @@ const SalesEntry = () => {
     setIsEditMode(true);
     setEditSaleId(sale._id);
     setInvoiceNo(sale.invoiceNo);
+    if (sale.customerId && !customers.find(c => c._id === sale.customerId._id)) {
+      setCustomers(prev => [...prev, sale.customerId]);
+    }
     setCustomerId(sale.customerId?._id || "");
     setCart(
       sale.items.map((i) => ({
@@ -277,8 +287,16 @@ const SalesEntry = () => {
   }, [salesList]);
 
   // ===== PAGINATION =====
-  const totalPages = Math.ceil(salesList.length / limit);
-  const paginatedSales = salesList.slice((page - 1) * limit, page * limit);
+  const filteredSales = salesList.filter((s) => {
+    const q = searchText.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      String(s.invoiceNo || "").toLowerCase().includes(q) ||
+      String(s.customerId?.name || "Cash Customer").toLowerCase().includes(q)
+    );
+  });
+  const totalPages = Math.ceil(filteredSales.length / limit);
+  const paginatedSales = filteredSales.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="container my-4">
@@ -299,7 +317,7 @@ const SalesEntry = () => {
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
               >
-                <option value="">Cash Customer</option>
+                <option value="">Walk In Customer</option>
                 {customers.map((c) => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
@@ -324,7 +342,7 @@ const SalesEntry = () => {
                     className={`list-group-item list-group-item-action ${idx === selectedIndex ? "bg-secondary text-white" : ""}`}
                     onClick={() => addToCart(item)}
                   >
-                    {item.name || item.item_name} ({item.genericName || item.generic_name})
+                    {(item.name || item.item_name)} ({item.genericName || item.generic_name || "N/A"}) | Stock: {Number(item.stock || 0)}
                   </li>
                 ))}
               </ul>
@@ -346,7 +364,12 @@ const SalesEntry = () => {
               <tbody>
                 {cart.map((item, idx) => (
                   <tr key={idx}>
-                    <td>{item.name}</td>
+                    <td>
+                    {item.name}
+                    {item.genericName || item.generic_name ? (
+                      <div className="text-muted small">{item.genericName || item.generic_name}</div>
+                    ) : null}
+                  </td>
                     <td><input type="number" className="form-control" value={item.quantity} onChange={(e) => updateCart(idx, "quantity", e.target.value)} /></td>
                     <td><input type="number" className="form-control" value={item.price} onChange={(e) => updateCart(idx, "price", e.target.value)} /></td>
                     <td>{item.total}</td>
@@ -403,6 +426,17 @@ const SalesEntry = () => {
       <div className="card shadow-sm print-hide">
         <div className="card-header bg-secondary text-white"><h4>Sales List</h4></div>
         <div className="card-body table-responsive">
+          <div className="mb-3">
+            <input
+              className="form-control"
+              placeholder="Search by invoice/customer..."
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
           <table className="table table-striped table-bordered text-center">
             <thead className="table-dark">
               <tr>
@@ -432,7 +466,7 @@ const SalesEntry = () => {
                       hour12: true,
                     })}
                   </td>
-                  <td>{s.customerId?.name || "Cash Customer"}</td>
+                  <td>{s.customerId?.name || "Walk In Customer"}</td>
                   <td>{Number(s.discount || 0)}</td>
                   <td>{s.totalAmount}</td>
                   <td>{s.totalPaid}</td>

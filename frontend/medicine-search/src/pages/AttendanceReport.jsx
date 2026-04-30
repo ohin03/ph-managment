@@ -38,7 +38,7 @@ const AttendanceReport = () => {
             {/* Header */}
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                 <div>
-                    <h2 className="fw-bold text-dark mb-1">📈 Attendance Insights</h2>
+                    <h2 className="fw-bold text-primary mb-1">📈 Attendance Insights</h2>
                     <p className="text-muted">Visual data representation of staff performance</p>
                 </div>
                 <div className="d-flex gap-2 bg-white p-2 rounded-4 shadow-sm">
@@ -52,7 +52,7 @@ const AttendanceReport = () => {
             <div className="row g-4 mb-4">
                 {/* Bar Chart: Individual Performance */}
                 <div className="col-xl-8">
-                    <div className="card border-0 shadow-sm rounded-4 p-4 h-100">
+                    <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-success-subtle">
                         <h5 className="fw-bold mb-4">Staff Performance Comparison</h5>
                         <div style={{ width: '100%', height: 300 }}>
                             <ResponsiveContainer>
@@ -73,7 +73,7 @@ const AttendanceReport = () => {
 
                 {/* Pie Chart: Overall Status */}
                 <div className="col-xl-4">
-                    <div className="card border-0 shadow-sm rounded-4 p-4 h-100 text-center">
+                    <div className="card border-0 shadow-sm rounded-4 p-4 h-100 text-center bg-dark-subtle">
                         <h5 className="fw-bold mb-2">Overall Distribution</h5>
                         <div style={{ width: '100%', height: 250 }}>
                             <ResponsiveContainer>
@@ -99,7 +99,7 @@ const AttendanceReport = () => {
             {/* Detailed Table */}
             <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div className="p-4 bg-white border-bottom">
-                    <h5 className="fw-bold mb-0">Detailed Monthly Log</h5>
+                    <h5 className="fw-bold mb-0 text-info">Detailed Monthly Log</h5>
                 </div>
                 <div className="table-responsive">
                     <table className="table table-hover align-middle mb-0">

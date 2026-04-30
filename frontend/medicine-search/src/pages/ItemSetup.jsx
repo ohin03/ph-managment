@@ -18,6 +18,7 @@ const ItemSetup = () => {
     companyName: "",
     stock: "",
     purchasePrice: "",
+    salesPrice: "",
     expiryDate: "",
     batchNo: ""
   });
@@ -112,6 +113,7 @@ const ItemSetup = () => {
       companyName: item.companyName,
       stock: item.stock,
       purchasePrice: item.purchasePrice,
+      salesPrice: item.salesPrice || "",
       expiryDate: item.expiryDate?.substring(0, 10) || "",
       batchNo: item.batchNo
     });
@@ -199,17 +201,17 @@ const ItemSetup = () => {
             </div>
 
             <div className="col-md-3">
-              <input type="date" name="expiryDate"
+              <input type="number" name="salesPrice" placeholder="Sale Price"
                 className="form-control"
-                value={formData.expiryDate}
+                value={formData.salesPrice}
                 onChange={handleChange}
               />
             </div>
 
             <div className="col-md-3">
-              <input name="batchNo" placeholder="Batch No"
+              <input type="date" name="expiryDate"
                 className="form-control"
-                value={formData.batchNo}
+                value={formData.expiryDate}
                 onChange={handleChange}
               />
             </div>
@@ -231,6 +233,7 @@ const ItemSetup = () => {
                     companyName: "",
                     stock: "",
                     purchasePrice: "",
+                    salesPrice: "",
                     expiryDate: "",
                     batchNo: ""
                   });
@@ -257,7 +260,8 @@ const ItemSetup = () => {
                 <th>Generic</th>
                 <th>Company</th>
                 <th>Stock</th>
-                <th>Price</th>
+                <th>Purchase Price</th>
+                <th>Sale Price</th>
                 <th>Expiry</th>
                 <th>Batch</th>
                 <th>Action</th>
@@ -272,6 +276,7 @@ const ItemSetup = () => {
                   <td>{item.companyName}</td>
                   <td>{item.stock}</td>
                   <td>{item.purchasePrice}</td>
+                  <td>{item.salesPrice || 0}</td>
                   <td>
                     {item.expiryDate
                       ? new Date(item.expiryDate).toLocaleDateString()
@@ -297,7 +302,7 @@ const ItemSetup = () => {
 
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="text-center">
+                  <td colSpan="9" className="text-center">
                     No Medicines Found
                   </td>
                 </tr>

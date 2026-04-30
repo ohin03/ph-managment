@@ -64,6 +64,7 @@ exports.addItem = async (req, res) => {
       companyName,
       stock,
       purchasePrice,
+      salesPrice,
       batchNo,
       expiryDate,
     } = req.body;
@@ -78,6 +79,7 @@ exports.addItem = async (req, res) => {
       companyName: companyName || "",
       stock: stock || 0,
       purchasePrice: purchasePrice || 0,
+      salesPrice: salesPrice || 0,
       batchNo: batchNo || "",
       expiryDate: expiryDate ? new Date(expiryDate) : null,
     });
@@ -104,6 +106,7 @@ exports.updateItem = async (req, res) => {
       companyName,
       stock,
       purchasePrice,
+      salesPrice,
       batchNo,
       expiryDate,
     } = req.body;
@@ -116,6 +119,7 @@ exports.updateItem = async (req, res) => {
         companyName,
         stock,
         purchasePrice,
+        salesPrice,
         batchNo,
         expiryDate: expiryDate ? new Date(expiryDate) : null,
       },

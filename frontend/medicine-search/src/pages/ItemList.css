@@ -16,6 +16,22 @@
   color: #1e3a8a;
 }
 
+.itemlist-search {
+  max-width: 420px;
+  margin: 0 auto 20px;
+}
+
+.itemlist-search .form-control {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 10px 14px;
+}
+
+.itemlist-search .form-control:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
+}
+
 /* Table */
 .itemlist-wrapper table {
   width: 100%;

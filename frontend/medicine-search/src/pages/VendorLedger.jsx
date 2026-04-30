@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useMemo } from "react";
 import { getVendorLedger } from "../api/ledgerApi";
 import { getVendors } from "../api/vendorApi";
 import { toast } from "react-toastify";
+import { useParams, useNavigate } from "react-router-dom";
+import { 
+  FaPrint, FaSync, FaArrowLeft, FaFileInvoice, 
+  FaHandHoldingUsd, FaBoxOpen, FaDownload, FaPlus, FaCheckCircle, FaClock,
+  FaChevronLeft, FaChevronRight
+} from "react-icons/fa";
 
 const VendorLedger = () => {
   const { vendorId } = useParams();
@@ -12,150 +17,350 @@ const VendorLedger = () => {
   const [ledger, setLedger] = useState([]);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
-  // Load all vendors for dropdown
+  // --- Pagination States ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  const selectedVendor = useMemo(() => 
+    vendors.find(v => v._id === vendorId), 
+    [vendors, vendorId]
+  );
+
   useEffect(() => {
-    const fetchVendors = async () => {
+    const fetchVendorsList = async () => {
       try {
-        const res = await getVendors("", 1, 1000); // সব vendors নিয়ে আসছি
-        setVendors(res.data); // শুধু array রাখো
+        const res = await getVendors("", 1, 1000);
+        setVendors(res.data || []);
       } catch {
-        toast.error("Failed to load vendors");
+        toast.error("Failed to load vendor list");
       }
     };
-    fetchVendors();
+    fetchVendorsList();
   }, []);
 
-  // Fetch ledger when vendorId changes
-  const fetchLedger = async (id) => {
-    if (!id) return;
-    try {
-      setLoading(true);
-      const data = await getVendorLedger(id);
-      setLedger(data.entries || []);
-      setBalance(data.currentDue || 0);
-    } catch {
-      toast.error("Failed to load ledger");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (vendorId) fetchLedger(vendorId);
+    const fetchLedgerData = async () => {
+      if (!vendorId) return;
+      try {
+        setLoading(true);
+        const data = await getVendorLedger(vendorId);
+        setLedger(data.entries || []);
+        setBalance(data.currentDue || 0);
+        setCurrentPage(1); // ভেন্ডর চেঞ্জ হলে ১ম পেজে চলে যাবে
+      } catch {
+        toast.error("Error loading vendor ledger");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLedgerData();
   }, [vendorId]);
 
-  const selectedVendor = vendors.find((v) => v._id === vendorId); // এখন ঠিকঠাক কাজ করবে
+  const filteredVendors = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return vendors;
+    return vendors.filter(v => 
+      (v.name && v.name.toLowerCase().includes(term)) || 
+      (v.company && v.company.toLowerCase().includes(term))
+    );
+  }, [searchTerm, vendors]);
+
+  const filteredLedger = useMemo(() => {
+    return ledger.filter(entry => {
+      const entryDate = new Date(entry.date).toISOString().split('T')[0];
+      return (!dateRange.start || entryDate >= dateRange.start) && 
+             (!dateRange.end || entryDate <= dateRange.end);
+    });
+  }, [ledger, dateRange]);
+
+  // --- Pagination Logic ---
+  const totalPages = Math.ceil(filteredLedger.length / itemsPerPage);
+  
+  const currentTableData = useMemo(() => {
+    const firstPageIndex = (currentPage - 1) * itemsPerPage;
+    const lastPageIndex = firstPageIndex + itemsPerPage;
+    return filteredLedger.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage, filteredLedger]);
+
+  const totalPurchase = filteredLedger.reduce((s, i) => s + (i.debit || 0), 0);
+  const totalPaid = filteredLedger.reduce((s, i) => s + (i.credit || 0), 0);
 
   return (
-    <div className="container-fluid py-4">
-      <h3 className="fw-bold mb-3">Vendor Ledger</h3>
-
-      {/* Vendor Selector */}
-      <div className="d-flex justify-content-center mb-4">
-        <select
-          className="form-select w-50"
-          value={vendorId || ""}
-          onChange={(e) => navigate(`/vendor-ledger/${e.target.value}`)}
-        >
-          <option value="">Select Vendor...</option>
-          {vendors.map((v) => (
-            <option key={v._id} value={v._id}>
-              {v.name} {v.company ? `(${v.company})` : ""}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Summary Cards */}
-      {selectedVendor && (
-        <div className="row mb-4">
-          <div className="col-md-4">
-            <div className="card shadow text-center p-3">
-              <h6>Current Balance</h6>
-              <h3 className={balance > 0 ? "text-danger" : "text-success"}>
-                ৳ {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-              </h3>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card shadow text-center p-3">
-              <h6>Total Transactions</h6>
-              <h3>{ledger.length}</h3>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card shadow text-center p-3">
-              <h6>Status</h6>
-              <h3 className={balance > 0 ? "text-danger" : "text-success"}>
-                {balance > 0 ? "Due Pending" : "Cleared"}
-              </h3>
-            </div>
+    <div className="erp-root">
+      <header className="erp-header no-print">
+        <div className="header-brand">
+          <button className="btn-circle-back" onClick={() => navigate(-1)}>
+            <FaArrowLeft size={12} />
+          </button>
+          <div className="title-group">
+            <h6 className="m-0 text-primary-dark">Vendor Ledger</h6>
+            <span className="subtitle">Supplier Accounts Management</span>
           </div>
         </div>
-      )}
-
-      {/* Ledger Table */}
-      <div className="card shadow">
-        <div className="card-header bg-dark text-white fw-semibold">
-          Transaction Details
-          <button
-            className="btn btn-light btn-sm float-end"
-            onClick={() => window.print()}
-          >
-            Print
+        <div className="header-actions">
+          <button className="btn-action btn-print" onClick={() => window.print()}>
+            <FaPrint size={12} /> <span>Print Statement</span>
+          </button>
+          <button className="btn-action btn-refresh" onClick={() => window.location.reload()}>
+            <FaSync size={12} /> <span>Refresh</span>
           </button>
         </div>
+      </header>
 
-        <div className="card-body p-0">
-          {loading ? (
-            <div className="text-center p-5">
-              <div className="spinner-border text-primary"></div>
+      <div className="erp-layout">
+        <aside className="erp-sidebar no-print">
+          <div className="sidebar-search">
+            <input 
+              type="text" 
+              className="modern-input"
+              placeholder="Search vendor or company..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+
+          <div className="sidebar-list custom-scroll">
+            {filteredVendors.length > 0 ? (
+              filteredVendors.map(v => (
+                <div 
+                  key={v._id} 
+                  className={`cust-item ${vendorId === v._id ? "active" : ""}`}
+                  onClick={() => navigate(`/vendor-ledger/${v._id}`)}
+                >
+                  <div className="cust-info">
+                    <span className="cust-name">{v.name}</span>
+                    <span className="cust-phone">{v.company || "No Company Info"}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-3 text-center text-muted small">No vendors found</div>
+            )}
+          </div>
+
+          <div className="sidebar-footer">
+            <button className="btn-add-new" onClick={() => navigate('/administration/vendor-setup')}>
+              <FaPlus size={10} /> <span>New Supplier</span>
+            </button>
+          </div>
+        </aside>
+
+        <main className="erp-content">
+          <div className="print-header">
+             <div className="biz-info">
+                <h1>MEDICINE CORNER & PHARMACY</h1>
+                <p>Retail & Wholesale Medicine Supplier</p>
+                <p className="small">Printed: {new Date().toLocaleString()}</p>
+             </div>
+             <div className="cust-print-details">
+                <div className="statement-label">SUPPLIER STATEMENT</div>
+                <p><strong>Supplier:</strong> {selectedVendor?.name || 'N/A'}</p>
+                <p><strong>Company:</strong> {selectedVendor?.company || 'N/A'}</p>
+             </div>
+          </div>
+
+          <div className="kpi-container">
+            <div className="kpi-card debit-card">
+              <div className="kpi-icon-mini text-danger-bg"><FaBoxOpen size={14} /></div>
+              <div className="kpi-data">
+                <label>Total Purchase</label>
+                <h5 className="text-danger">৳{totalPurchase.toLocaleString()}</h5>
+              </div>
             </div>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-striped table-hover align-middle mb-0 text-center">
-                <thead className="table-light">
+            <div className="kpi-card credit-card">
+              <div className="kpi-icon-mini text-success-bg"><FaHandHoldingUsd size={14} /></div>
+              <div className="kpi-data">
+                <label>Total Paid</label>
+                <h5 className="text-success">৳{totalPaid.toLocaleString()}</h5>
+              </div>
+            </div>
+            <div className="kpi-card balance-card">
+              <div className="kpi-icon-mini text-primary-bg"><FaFileInvoice size={14} /></div>
+              <div className="kpi-data">
+                <label>Current Payable</label>
+                <h5 className="text-primary-dark">৳{balance.toLocaleString()}</h5>
+              </div>
+            </div>
+          </div>
+
+          <div className="ledger-box">
+            <div className="ledger-filter-row no-print">
+              <div className="date-group">
+                <input type="date" value={dateRange.start} onChange={(e) => setDateRange({...dateRange, start: e.target.value})} />
+                <span className="sep">TO</span>
+                <input type="date" value={dateRange.end} onChange={(e) => setDateRange({...dateRange, end: e.target.value})} />
+              </div>
+              <button className="btn-export-mini">
+                <FaDownload size={10} /> <span>Export Data</span>
+              </button>
+            </div>
+
+            <div className="table-wrapper">
+              <table className="erp-table">
+                <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Reference</th>
-                    <th>Description</th>
-                    <th className="text-danger">Debit (৳)</th>
-                    <th className="text-success">Credit (৳)</th>
-                    <th>Running Balance</th>
+                    <th>Ref ID & Description</th>
+                    <th className="no-print">Status</th>
+                    <th className="text-end">Purchase (+)</th>
+                    <th className="text-end">Paid (-)</th>
+                    <th className="text-end pe-3">Balance</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {ledger.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="py-4 text-muted">
-                        No transactions found.
-                      </td>
-                    </tr>
+                  {loading ? (
+                    <tr><td colSpan="6" className="status-cell">Loading transactions...</td></tr>
                   ) : (
-                    ledger.map((entry) => (
-                      <tr key={entry._id}>
-                        <td>{new Date(entry.date).toLocaleDateString()}</td>
-                        <td className="fw-semibold">{entry.reference}</td>
-                        <td>{entry.description}</td>
-                        <td className="text-danger fw-semibold">
-                          {entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td className="text-success fw-semibold">
-                          {entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td className="fw-bold">
-                          ৳ {entry.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ))
+                    currentTableData.length > 0 ? (
+                        currentTableData.map((entry, idx) => (
+                        <tr key={idx}>
+                          <td>
+                            <div className="txt-bold">{new Date(entry.date).toLocaleDateString()}</div>
+                            <div className="txt-small no-print">{new Date(entry.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                          </td>
+                          <td>
+                            <div className="txt-bold text-dark">{entry.reference}</div>
+                            <div className="txt-muted small">{entry.description}</div>
+                          </td>
+                          <td className="no-print">
+                            {entry.balance === 0 ? (
+                              <span className="status-badge cleared"><FaCheckCircle size={10} /> Paid</span>
+                            ) : (
+                              <span className="status-badge pending"><FaClock size={10} /> Pending</span>
+                            )}
+                          </td>
+                          <td className="text-end txt-bold text-danger">{entry.debit ? `৳${entry.debit.toLocaleString()}` : "—"}</td>
+                          <td className="text-end txt-bold text-success-dark">{entry.credit ? `৳${entry.credit.toLocaleString()}` : "—"}</td>
+                          <td className="text-end pe-3">
+                            <span className="badge-balance">৳{entry.balance.toLocaleString()}</span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr><td colSpan="6" className="text-center p-4 text-muted">No records available</td></tr>
+                    )
                   )}
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
+
+            {/* --- Pagination UI --- */}
+            <div className="pagination-wrapper no-print">
+              <span className="page-info">
+                Page <strong>{currentPage}</strong> of <strong>{totalPages || 1}</strong>
+              </span>
+              <div className="page-buttons">
+                <button 
+                  className="btn-page" 
+                  disabled={currentPage === 1} 
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                >
+                  <FaChevronLeft size={10} /> Prev
+                </button>
+                <button 
+                  className="btn-page" 
+                  disabled={currentPage === totalPages || totalPages === 0} 
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                  Next <FaChevronRight size={10} />
+                </button>
+              </div>
+            </div>
+
+            <div className="print-footer">
+               <div className="sig-box">
+                  <div className="line"></div>
+                  <p>Authorized Signature</p>
+               </div>
+               <div className="sig-box">
+                  <div className="line"></div>
+                  <p>Vendor Signature</p>
+               </div>
+            </div>
+          </div>
+        </main>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        .erp-root { background: #f8fafc; min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .text-primary-dark { color: #0f172a; font-weight: 800; }
+        .text-success-dark { color: #15803d; }
+
+        .erp-header { height: 55px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .btn-circle-back { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 50%; color: #6366f1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .title-group h6 { font-size: 0.9rem; margin: 0; }
+        .title-group .subtitle { font-size: 0.7rem; color: #64748b; font-weight: 500; }
+        
+        .header-actions { display: flex; gap: 8px; }
+        .btn-action { border: none; padding: 7px 15px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .btn-print { background: #fff; border: 1px solid #e2e8f0; color: #475569; }
+        .btn-refresh { background: #6366f1; color: #fff; }
+
+        .erp-layout { display: flex; height: calc(100vh - 55px); }
+        .erp-sidebar { width: 270px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+        .sidebar-search { padding: 15px; }
+        .modern-input { border: 1px solid #cbd5e1; background: #f8fafc; padding: 10px 12px; border-radius: 10px; width: 100%; font-size: 0.8rem; outline: none; }
+        .sidebar-list { flex: 1; overflow-y: auto; padding: 8px; }
+        .cust-item { padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 4px; border: 1px solid transparent; }
+        .cust-item:hover { background: #f1f5f9; }
+        .cust-item.active { background: #f0f4ff; border-color: #c7d2fe; }
+        .cust-name { display: block; font-size: 0.85rem; font-weight: 700; color: #1e293b; }
+        .cust-phone { font-size: 0.75rem; color: #64748b; }
+        .sidebar-footer { padding: 15px; }
+        .btn-add-new { width: 100%; background: #fff; border: 1px dashed #6366f1; color: #6366f1; padding: 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+
+        .erp-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .kpi-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .kpi-card { flex: 1; background: #fff; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; }
+        .kpi-icon-mini { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .text-danger-bg { background: #fef2f2; color: #ef4444; }
+        .text-success-bg { background: #f0fdf4; color: #22c55e; }
+        .text-primary-bg { background: #eff6ff; color: #3b82f6; }
+        .kpi-data label { font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 800; display: block; }
+        .kpi-data h5 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+
+        .ledger-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .ledger-filter-row { padding: 15px 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
+        .date-group { display: flex; align-items: center; gap: 10px; }
+        .date-group input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; font-size: 0.8rem; }
+        .btn-export-mini { background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.75rem; font-weight: 700; padding: 6px 14px; border-radius: 8px; }
+
+        .erp-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .erp-table thead th { background: #f8fafc; padding: 14px 20px; text-align: left; font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 800; border-bottom: 1px solid #e2e8f0; }
+        .erp-table td { padding: 14px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.85rem; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; gap: 5px; width: fit-content; }
+        .status-badge.cleared { background: #dcfce7; color: #15803d; }
+        .status-badge.pending { background: #fef9c3; color: #a16207; }
+        .badge-balance { background: #f8fafc; padding: 6px 12px; border-radius: 8px; font-weight: 800; border: 1px solid #e2e8f0; }
+
+        /* --- Pagination Styling --- */
+        .pagination-wrapper { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #fff; border-top: 1px solid #f1f5f9; border-radius: 0 0 14px 14px; }
+        .page-info { font-size: 0.8rem; color: #64748b; }
+        .page-buttons { display: flex; gap: 10px; }
+        .btn-page { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: #475569; cursor: pointer; transition: 0.2s; }
+        .btn-page:hover:not(:disabled) { background: #f1f5f9; }
+        .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .print-header, .print-footer { display: none; }
+
+        @media print {
+          .no-print { display: none !important; }
+          .erp-content { padding: 0; }
+          .ledger-box { border: none; }
+          .print-header { display: flex !important; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+          .biz-info h1 { font-size: 24px; margin: 0; color: #1e293b; }
+          .statement-label { background: #000; color: #fff; padding: 5px 15px; font-weight: 800; display: inline-block; margin-bottom: 10px; }
+          .print-footer { display: flex !important; justify-content: space-between; margin-top: 100px; }
+          .sig-box { text-align: center; width: 200px; border-top: 1px solid #000; padding-top: 5px; font-weight: 700; font-size: 13px; }
+        }
+      `}</style>
     </div>
   );
 };

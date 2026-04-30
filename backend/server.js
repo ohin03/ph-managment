@@ -17,6 +17,7 @@ const BankRoutes = require("./routes/bank.route");
 const accountRoutes = require("./routes/account.route");
 const purchaseRoutes = require("./routes/purchase.route");
 const purchaseReturnRoutes = require("./routes/purchaseReturn.route");
+const medicineRoutes = require("./routes/medicine.routes");
 const salesReturnRoutes = require("./routes/salesReturn");
 const vendorSaleRoutes = require("./routes/vendorSaleRoutes")
 const reportRoutes = require("./routes/report.route");
@@ -65,6 +66,7 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/banks", BankRoutes);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/purchases", purchaseRoutes);
+app.use("/api/medicines", medicineRoutes);
 app.use("/api/purchase-returns", purchaseReturnRoutes);
 app.use("/api/sales-return", salesReturnRoutes);
 const searchRoute = require("./routes/search");
