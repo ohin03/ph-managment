@@ -19,7 +19,7 @@ export default function Dashboard() {
   const { role } = useAuth();
   
   const [loading, setLoading] = useState(true);
-  const todaysDate = new Date().toISOString().split('T')[0];
+  const todaysDate = new Date().toLocaleDateString('sv-SE');
   const [filterDate, setFilterDate] = useState(todaysDate);
   const [data, setData] = useState({
     totalOrders: 0, totalMedicines: 0, totalCustomers: 0, totalSuppliers: 0,

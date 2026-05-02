@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+process.env.TZ = 'Asia/Dhaka';
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");

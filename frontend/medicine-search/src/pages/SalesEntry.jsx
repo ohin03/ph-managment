@@ -9,16 +9,7 @@ import "./SalesEntry.css";
 const SalesEntry = () => {
   // ===== DATE & TIME =====
   const getBangladeshNow = () =>
-    new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Dhaka",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    });
+    new Date().toISOString();
 
   // ===== STATE =====
   const [invoiceNo, setInvoiceNo] = useState(`INV-${Date.now()}`);
